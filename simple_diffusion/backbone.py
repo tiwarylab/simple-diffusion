@@ -39,7 +39,6 @@ class Backbone(nn.Module):
                  num_dims=3,
                  lr=1e-3,
                  optim=None,
-                 scheduler=None,
                 ):
 
         super().__init__()
@@ -66,13 +65,6 @@ class Backbone(nn.Module):
 
         self.optim = default(optim_dict["Adam"], optim)
 
-        scheduler_dict = {"multistep": MultiStepLR(self.optim,
-                                                   milestones=[5],
-                                                   gamma=0.1),
-                         }
-
-        self.scheduler = default(scheduler_dict["multistep"], scheduler)
-
     @staticmethod
     def get_model_path(directory, epoch):
         return os.path.join(directory.model_path, f"{directory.identifier}_{epoch}.pt")
@@ -91,7 +83,7 @@ class Backbone(nn.Module):
         loads internal state of the backbone model.
         """
         state_dict = torch.load(self.get_model_path(directory, epoch),
-                                map_location=torch.device(directory.device))
+                                map_location=torch.device(self.device))
         return state_dict
 
     def load_model(self, directory, epoch):
@@ -102,22 +94,37 @@ class Backbone(nn.Module):
         self.model.load_state_dict(state_dict["model"])
         self.optim.load_state_dict(state_dict["optim"])
         self.start_epoch = int(state_dict['epoch'])+1
-        
+
 class ConvBackbone1D(Backbone):
     """
     Backbone with a forward method for 1D Convolutional Networks
     """
-    def __init__(self, model, data_shape, target_shape, num_dims=4, lr=1e-3, 
-                 optim=None, eval_mode='train', scheduler=None):
+    def __init__(self, model, data_shape, target_shape, num_dims=4, lr=1e-3,
+                 optim=None, eval_mode='train', self_condition=True):
 
-        super().__init__(model, data_shape, target_shape, num_dims, lr, optim, scheduler)
+        super().__init__(model, data_shape, target_shape, num_dims, lr, optim)
         self.eval_mode = eval_mode
+        self.self_condition = self_condition
+
+    def get_self_condition(self, data, t):
+        if self.eval_mode == 'train' and self.self_condition == True:
+            if torch.rand(1) < 0.5:
+                with torch.no_grad():
+                    return self.model(data.to(self.device), t.to(self.device))
+            else:
+                return None
+        elif self.eval_mode == 'sample' and self.self_condition == True:
+            return self.model(data.to(self.device), t.to(self.device))
+        else:
+            return None
 
     def forward(self, batch, t):
         upsampled = self.interp.to_target(batch) # matches shape to network
-
+        self_condition = self.get_self_condition(upsampled, t)
         upsampled_out = self.model(upsampled.to(self.device),
-                                   t.to(self.device))
+                                   t.to(self.device),
+                                   x_self_cond=self_condition)
+        #batch_out = upsampled_out.to("cpu")
         batch_out = self.interp.from_target(upsampled_out.to("cpu"))
         return batch_out
-        
+
