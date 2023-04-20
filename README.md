@@ -6,4 +6,4 @@ conda env create --file simple-diffusion.yml -n simple-diffusion
 conda activate simple-diffusion
 jupyter-notebook
 ```
-Then open the `simple_diffusion/simple-diffusion.ipynb` notebook.
+Then open the `simple_diffusion/simple_diffusion.ipynb` notebook.
