@@ -178,4 +178,3 @@ dependencies:
   - zeromq=4.3.4=hbdafb3b_1
   - zipp=3.15.0=pyhd8ed1ab_0
   - zstd=1.5.2=hf913c23_6
-prefix: /Users/lukasherron/mambaforge/envs/simple-diffusion
