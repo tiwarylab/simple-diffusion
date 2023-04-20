@@ -10,8 +10,6 @@ from torch import nn, einsum
 import torch.nn.functional as F
 from einops import rearrange, reduce
 
-# helpers functions
-
 def exists(x):
     return x is not None
 
@@ -207,7 +205,7 @@ class LinearAttention(nn.Module):
         q = q.softmax(dim = -2)
         k = k.softmax(dim = -1)
 
-        q = q * self.scale        
+        q = q * self.scale
 
         context = torch.einsum('b h d n, b h e n -> b h d e', k, v)
 

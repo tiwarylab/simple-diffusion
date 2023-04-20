@@ -1,4 +1,4 @@
-import torch 
+import torch
 from functorch import vmap
 import torch.nn.functional as F
 import torch.nn as nn
@@ -36,7 +36,7 @@ class VPDiffusion:
         self.alphas = NOISE_FUNCS[noise_schedule](torch.arange(num_diffusion_timesteps+1),
                                                   alpha_max,
                                                   alpha_min)
-        
+
     def get_alphas(self):
         return self.alphas
 
@@ -56,14 +56,14 @@ class VPDiffusion:
         """
         # get noise schedule
         alphas_t = self.alphas[t]
-        
+
         # predict noise added to data
         if pred_type == "noise":
             noise = backbone(x_t, alphas_t)
             noise_interp = self.bmul(noise, (1-alphas_t).sqrt())
             # predict x0 given x_t and noise
             x0_t = self.bmul((x_t - noise_interp), 1/alphas_t.sqrt())
-            
+
         # predict data
         elif pred_type == "x0":
             x0_t = backbone(x_t, alphas_t)
@@ -83,10 +83,10 @@ class VPDiffusion:
         # getting noise schedule
         alphas_t = self.alphas[t]
         alphas_t_next = self.alphas[t_next]
-        
+
         # computing x_0' ~ p(x_0|x_t)
         x0_t, noise = self.reverse_kernel(x_t, t, backbone, pred_type)
-        
+
         # computing x_t+1 = f(x_0', x_t, noise)
         xt_next = self.bmul(alphas_t_next.sqrt(), x0_t) + self.bmul((1-alphas_t_next).sqrt(), noise)
         return xt_next
