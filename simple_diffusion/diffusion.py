@@ -1,5 +1,5 @@
 import torch 
-from torch import vmap
+from functorch import vmap
 import torch.nn.functional as F
 import torch.nn as nn
 
