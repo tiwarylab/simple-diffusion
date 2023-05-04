@@ -8,4 +8,4 @@ jupyter-notebook
 ```
 Then open the `simple_diffusion/simple_diffusion.ipynb` notebook.
 
-Or, checkout the implementation in Colab.
+Or, checkout the implementation in [Colab](https://colab.research.google.com/github/lherron2/simple-diffusion/blob/main/%20simple-diffusion/simple_diffusion/simple_diffusion_colab.ipynb).
