@@ -7,3 +7,5 @@ conda activate simple-diffusion
 jupyter-notebook
 ```
 Then open the `simple_diffusion/simple_diffusion.ipynb` notebook.
+
+Or, checkout the implementation in Colab.
