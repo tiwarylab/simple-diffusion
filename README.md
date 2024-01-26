@@ -2,7 +2,7 @@
 A simple example showcasing how diffusion models are trained and used to sample complicated distributions.
 
 ```
-conda env create -n simple-diffusion
+conda create --name simple-diffusion python=3.10 --yes
 conda activate simple-diffusion
 pip install -r requirements.txt
 jupyter notebook
